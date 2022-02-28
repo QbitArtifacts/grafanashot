@@ -5,6 +5,7 @@ from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.firefox.options import Options
 from selenium.webdriver.support.wait import WebDriverWait
+from selenium.webdriver.firefox.service import Service
 
 from selenium.webdriver.support import expected_conditions as EC
 
@@ -18,10 +19,8 @@ password = sys.argv[3]
 
 options = Options()
 options.headless = True
-driver = webdriver.Firefox(
-    options=options,
-    executable_path='./bin/geckodriver'
-)
+service = Service('./bin/geckodriver')
+driver = webdriver.Firefox(options=options, service=service)
 driver.get(full_url)
 
 # Wait for initialize, in seconds
