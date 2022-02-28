@@ -51,4 +51,7 @@ snapshot_button.click()
 
 snapshot_link = wait.until(EC.visibility_of_element_located((By.XPATH, '/html/body/div[2]/div[2]/div[2]/div/div[1]/div/a')))
 
+driver.close()
+driver.quit()
+
 print(snapshot_link.get_attribute('href') + '?kiosk')
