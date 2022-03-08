@@ -2,6 +2,7 @@
 import sys
 
 from selenium import webdriver
+from selenium.webdriver import Keys
 from selenium.webdriver.common.by import By
 from selenium.webdriver.firefox.options import Options
 from selenium.webdriver.support.wait import WebDriverWait
@@ -18,7 +19,7 @@ username = sys.argv[2]
 password = sys.argv[3]
 
 options = Options()
-options.headless = True
+#options.headless = True
 service = Service('./bin/geckodriver')
 driver = webdriver.Firefox(options=options, service=service)
 driver.get(full_url)
@@ -44,6 +45,17 @@ share_button.click()
 
 snapshot_tab = driver.find_element(By.XPATH, '/html/body/div[2]/div[2]/div[1]/div[1]/ul/li[2]/a')
 snapshot_tab.click()
+
+timeout_input = wait.until(EC.visibility_of_element_located((By.XPATH, '//*[@id="timeout-input"]')))
+timeout_input.send_keys('20')  # 20 sec must be far enough to get the data
+timeout_input.send_keys(Keys.ARROW_LEFT)
+timeout_input.send_keys(Keys.ARROW_LEFT)
+timeout_input.send_keys(Keys.BACK_SPACE)
+
+expire_selector = wait.until(EC.visibility_of_element_located((By.XPATH, '//*[@id="expire-select-input"]')))
+expire_selector.click()
+expire_selector.send_keys(Keys.ARROW_DOWN)
+expire_selector.send_keys(Keys.ENTER)
 
 snapshot_button = wait.until(EC.visibility_of_element_located((By.XPATH, '/html/body/div[2]/div[2]/div[2]/div/div[5]/div/div[3]/button')))
 snapshot_button.click()
