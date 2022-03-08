@@ -19,7 +19,7 @@ username = sys.argv[2]
 password = sys.argv[3]
 
 options = Options()
-#options.headless = True
+options.headless = True
 service = Service('./bin/geckodriver')
 driver = webdriver.Firefox(options=options, service=service)
 driver.get(full_url)
