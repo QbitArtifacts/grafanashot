@@ -52,11 +52,11 @@ for url in urls:
         snapshot_tab = driver.find_element(By.XPATH, '/html/body/div[2]/div[2]/div[1]/div[1]/ul/li[2]/a')
         snapshot_tab.click()
 
-        #timeout_input = wait.until(EC.visibility_of_element_located((By.XPATH, '//*[@id="timeout-input"]')))
-        #timeout_input.send_keys('20')  # 20 sec must be far enough to get the data
-        #timeout_input.send_keys(Keys.ARROW_LEFT)
-        #timeout_input.send_keys(Keys.ARROW_LEFT)
-        #timeout_input.send_keys(Keys.BACK_SPACE)
+        timeout_input = wait.until(EC.visibility_of_element_located((By.XPATH, '//*[@id="timeout-input"]')))
+        timeout_input.send_keys('20')  # 20 sec must be far enough to get the data
+        timeout_input.send_keys(Keys.ARROW_LEFT)
+        timeout_input.send_keys(Keys.ARROW_LEFT)
+        timeout_input.send_keys(Keys.BACK_SPACE)
 
         expire_selector = wait.until(EC.visibility_of_element_located((By.XPATH, '//*[@id="expire-select-input"]')))
         expire_selector.click()
