@@ -25,7 +25,7 @@ service = Service('./bin/geckodriver')
 driver = webdriver.Firefox(options=options, service=service)
 
 # Wait for initialize, in seconds
-wait = WebDriverWait(driver, 60)
+wait = WebDriverWait(driver, 120)
 
 driver.get(urls[0])
 
@@ -60,6 +60,7 @@ for url in urls:
 
         expire_selector = wait.until(EC.visibility_of_element_located((By.XPATH, '//*[@id="expire-select-input"]')))
         expire_selector.click()
+        expire_selector.send_keys(Keys.ARROW_DOWN)
         expire_selector.send_keys(Keys.ARROW_DOWN)
         expire_selector.send_keys(Keys.ENTER)
 
