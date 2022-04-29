@@ -53,7 +53,7 @@ for url in urls:
         snapshot_tab.click()
 
         timeout_input = wait.until(EC.visibility_of_element_located((By.XPATH, '//*[@id="timeout-input"]')))
-        timeout_input.send_keys('60')  # 60 sec must be far enough to get the data
+        timeout_input.send_keys('120')  # 60 sec must be far enough to get the data
         timeout_input.send_keys(Keys.ARROW_LEFT)
         timeout_input.send_keys(Keys.ARROW_LEFT)
         timeout_input.send_keys(Keys.BACK_SPACE)
