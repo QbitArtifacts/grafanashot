@@ -25,7 +25,7 @@ service = Service('./bin/geckodriver')
 driver = webdriver.Firefox(options=options, service=service)
 
 # Wait for initialize, in seconds
-wait = WebDriverWait(driver, 120)
+wait = WebDriverWait(driver, 150)
 
 driver.get(urls[0])
 
