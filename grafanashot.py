@@ -56,6 +56,7 @@ for url in urls:
         timeout_input.send_keys('120')  # 60 sec must be far enough to get the data
         timeout_input.send_keys(Keys.ARROW_LEFT)
         timeout_input.send_keys(Keys.ARROW_LEFT)
+        timeout_input.send_keys(Keys.ARROW_LEFT)
         timeout_input.send_keys(Keys.BACK_SPACE)
 
         expire_selector = wait.until(EC.visibility_of_element_located((By.XPATH, '//*[@id="expire-select-input"]')))
