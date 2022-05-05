@@ -12,12 +12,17 @@ from selenium.webdriver.firefox.service import Service
 from selenium.webdriver.support import expected_conditions as EC
 
 if len(sys.argv) < 4:
-    print("Usage: %s <user> <pass> (<dashboard_url>)+" % sys.argv[0])
+    print("Usage: %s <user> <pass> (<dashboard_url>)+ <timeout>?" % sys.argv[0])
     exit(-1)
 
 username = sys.argv[1]
 password = sys.argv[2]
 urls = sys.argv[3:]
+if urls[-1].isnumeric():
+    timeout = urls[-1]
+    urls = urls[:-1]
+else:
+    timeout = 120
 
 options = Options()
 options.headless = True
@@ -25,7 +30,7 @@ service = Service('./bin/geckodriver')
 driver = webdriver.Firefox(options=options, service=service)
 
 # Wait for initialize, in seconds
-wait = WebDriverWait(driver, 130)
+wait = WebDriverWait(driver, timeout + 10)
 
 driver.get(urls[0])
 
@@ -53,14 +58,16 @@ for url in urls:
         snapshot_tab.click()
 
         timeout_input = wait.until(EC.visibility_of_element_located((By.XPATH, '//*[@id="timeout-input"]')))
-        timeout_input.send_keys('120')  # 90 sec must be enough to get the data
-        timeout_input.send_keys(Keys.ARROW_LEFT)
-        timeout_input.send_keys(Keys.ARROW_LEFT)
-        timeout_input.send_keys(Keys.ARROW_LEFT)
+        timeout_str = str(timeout)
+        timeout_input.send_keys(timeout_str)  # set wait timeout
+        # delete before 4 seconds
+        for i in range(len(timeout_str)):
+            timeout_input.send_keys(Keys.ARROW_LEFT)
         timeout_input.send_keys(Keys.BACK_SPACE)
 
         expire_selector = wait.until(EC.visibility_of_element_located((By.XPATH, '//*[@id="expire-select-input"]')))
         expire_selector.click()
+        # set snapshot expire after 24h
         expire_selector.send_keys(Keys.ARROW_DOWN)
         expire_selector.send_keys(Keys.ARROW_DOWN)
         expire_selector.send_keys(Keys.ENTER)
