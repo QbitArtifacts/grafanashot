@@ -25,7 +25,7 @@ service = Service('./bin/geckodriver')
 driver = webdriver.Firefox(options=options, service=service)
 
 # Wait for initialize, in seconds
-wait = WebDriverWait(driver, 120)
+wait = WebDriverWait(driver, 130)
 
 driver.get(urls[0])
 
@@ -53,7 +53,8 @@ for url in urls:
         snapshot_tab.click()
 
         timeout_input = wait.until(EC.visibility_of_element_located((By.XPATH, '//*[@id="timeout-input"]')))
-        timeout_input.send_keys('90')  # 90 sec must be far enough to get the data
+        timeout_input.send_keys('120')  # 90 sec must be enough to get the data
+        timeout_input.send_keys(Keys.ARROW_LEFT)
         timeout_input.send_keys(Keys.ARROW_LEFT)
         timeout_input.send_keys(Keys.ARROW_LEFT)
         timeout_input.send_keys(Keys.BACK_SPACE)
