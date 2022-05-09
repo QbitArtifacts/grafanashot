@@ -1,4 +1,5 @@
-FROM debian:bullseye
+FROM debian:bookworm
+ENV DEBIAN_FRONTEND=noninteractive
 
 RUN apt update && apt install -y \
     python3-pip \
@@ -13,5 +14,5 @@ WORKDIR  /code
 RUN python3 -m venv venv
 RUN venv/bin/pip install -r requirements.txt
 
-ENTRYPOINT ["venv/bin/python", "grafanashot.py"]
+ENTRYPOINT ["./entrypoint.sh"]
 

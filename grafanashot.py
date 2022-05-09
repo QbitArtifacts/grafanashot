@@ -32,54 +32,82 @@ driver = webdriver.Firefox(options=options, service=service)
 # Wait for initialize, in seconds
 wait = WebDriverWait(driver, timeout + 10)
 
-driver.get(urls[0])
 
-username_input = driver.find_element(By.XPATH, '/html/body/div/div/main/div[3]/div/div[2]/div/div/form/div[1]/div[2]/div/div/input')
+def open_url(url):
+    driver.get(url)
 
-username_input.click()
-username_input.send_keys(username)
 
-password_input = driver.find_element(By.XPATH, '//*[@id="current-password"]')
-password_input.click()
-password_input.send_keys(password)
+def login(url, user, passw):
+    driver.get(url)
 
-login_button = driver.find_element(By.XPATH, '/html/body/div/div/main/div[3]/div/div[2]/div/div/form/button')
-login_button.click()
+    username_input = driver.find_element(By.XPATH,
+                                         '/html/body/div/div/main/div[3]/div/div[2]/div/div/form/div[1]/div[2]/div/div/input')
 
-snapshots = {}
-for url in urls:
-    if url not in snapshots:
-        driver.get(url)
+    username_input.click()
+    username_input.send_keys(user)
 
-        share_button = wait.until(EC.visibility_of_element_located((By.XPATH, '/html/body/div/div/main/div[3]/header/div/div[3]/div/button')))
-        share_button.click()
+    password_input = driver.find_element(By.XPATH, '//*[@id="current-password"]')
+    password_input.click()
+    password_input.send_keys(passw)
 
-        snapshot_tab = driver.find_element(By.XPATH, '/html/body/div[2]/div[2]/div[1]/div[1]/ul/li[2]/a')
-        snapshot_tab.click()
+    login_button = driver.find_element(By.XPATH, '/html/body/div/div/main/div[3]/div/div[2]/div/div/form/button')
+    login_button.click()
 
-        timeout_input = wait.until(EC.visibility_of_element_located((By.XPATH, '//*[@id="timeout-input"]')))
-        timeout_str = str(timeout)
-        timeout_input.send_keys(timeout_str)  # set wait timeout
-        # delete before 4 seconds
-        for i in range(len(timeout_str)):
-            timeout_input.send_keys(Keys.ARROW_LEFT)
-        timeout_input.send_keys(Keys.BACK_SPACE)
 
-        expire_selector = wait.until(EC.visibility_of_element_located((By.XPATH, '//*[@id="expire-select-input"]')))
-        expire_selector.click()
-        # set snapshot expire after 24h
-        expire_selector.send_keys(Keys.ARROW_DOWN)
-        expire_selector.send_keys(Keys.ARROW_DOWN)
-        expire_selector.send_keys(Keys.ENTER)
+def logout():
+    pass
 
-        snapshot_button = wait.until(EC.visibility_of_element_located((By.XPATH, '/html/body/div[2]/div[2]/div[2]/div/div[5]/div/div[3]/button')))
-        snapshot_button.click()
 
-        snapshot_link = wait.until(EC.visibility_of_element_located((By.XPATH, '/html/body/div[2]/div[2]/div[2]/div/div[1]/div/a')))
+def get_snapshot(url, timeout):
+    driver.get(url)
 
-        snapshots[url] = snapshot_link.get_attribute('href')
+    share_button = wait.until(
+        EC.visibility_of_element_located((By.XPATH, '/html/body/div/div/main/div[3]/header/div/div[3]/div/button')))
+    share_button.click()
 
-print(json.dumps(snapshots))
+    snapshot_tab = driver.find_element(By.XPATH, '/html/body/div[2]/div[2]/div[1]/div[1]/ul/li[2]/a')
+    snapshot_tab.click()
 
-driver.close()
-driver.quit()
+    timeout_input = wait.until(EC.visibility_of_element_located((By.XPATH, '//*[@id="timeout-input"]')))
+    timeout_str = str(timeout)
+    timeout_input.send_keys(timeout_str)  # set wait timeout
+    # delete before 4 seconds
+    for i in range(len(timeout_str)):
+        timeout_input.send_keys(Keys.ARROW_LEFT)
+    timeout_input.send_keys(Keys.BACK_SPACE)
+
+    expire_selector = wait.until(EC.visibility_of_element_located((By.XPATH, '//*[@id="expire-select-input"]')))
+    expire_selector.click()
+    # set snapshot expire after 24h
+    expire_selector.send_keys(Keys.ARROW_DOWN)
+    expire_selector.send_keys(Keys.ARROW_DOWN)
+    expire_selector.send_keys(Keys.ENTER)
+
+    snapshot_button = wait.until(
+        EC.visibility_of_element_located((By.XPATH, '/html/body/div[2]/div[2]/div[2]/div/div[5]/div/div[3]/button')))
+    snapshot_button.click()
+
+    snapshot_link = wait.until(
+        EC.visibility_of_element_located((By.XPATH, '/html/body/div[2]/div[2]/div[2]/div/div[1]/div/a')))
+
+    return snapshot_link.get_attribute('href')
+
+
+def close_driver():
+    driver.close()
+    driver.quit()
+
+
+if __name__ == '__main__':
+    open_url('about:blank')
+
+    login(username, password)
+
+    snapshots = {}
+    for url in urls:
+        if url not in snapshots:
+            result = get_snapshot(url, timeout)
+            snapshots[url] = result
+
+    print(json.dumps(snapshots))
+    close_driver()
