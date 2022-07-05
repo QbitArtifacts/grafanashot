@@ -11,103 +11,111 @@ from selenium.webdriver.firefox.service import Service
 
 from selenium.webdriver.support import expected_conditions as EC
 
-if len(sys.argv) < 4:
-    print("Usage: %s <user> <pass> (<dashboard_url>)+ <timeout>?" % sys.argv[0])
-    exit(-1)
 
-username = sys.argv[1]
-password = sys.argv[2]
-urls = sys.argv[3:]
-if urls[-1].isnumeric():
-    timeout = urls[-1]
-    urls = urls[:-1]
-else:
-    timeout = 120
+class GrafanaShot:
+    def __init__(self, headless=True):
+        options = Options()
+        options.headless = headless
+        service = Service('./bin/geckodriver')
+        self.driver = webdriver.Firefox(options=options, service=service)
+        self.clear()
 
-options = Options()
-options.headless = True
-service = Service('./bin/geckodriver')
-driver = webdriver.Firefox(options=options, service=service)
+    def open_url(self, url):
+        self.driver.get(url)
 
-# Wait for initialize, in seconds
-wait = WebDriverWait(driver, timeout + 10)
+    def clear(self):
+        self.open_url('about:blank')
 
+    def login(self, url, user, passw):
+        self.driver.get(url)
 
-def open_url(url):
-    driver.get(url)
+        username_input = self.driver.find_element(By.XPATH,
+                                             '/html/body/div/div/main/div[3]/div/div[2]/div/div/form/div[1]/div[2]/div/div/input')
 
+        username_input.click()
+        username_input.send_keys(user)
 
-def login(url, user, passw):
-    driver.get(url)
+        password_input = self.driver.find_element(By.XPATH, '//*[@id="current-password"]')
+        password_input.click()
+        password_input.send_keys(passw)
 
-    username_input = driver.find_element(By.XPATH,
-                                         '/html/body/div/div/main/div[3]/div/div[2]/div/div/form/div[1]/div[2]/div/div/input')
+        login_button = self.driver.find_element(By.XPATH, '/html/body/div/div/main/div[3]/div/div[2]/div/div/form/button')
+        login_button.click()
 
-    username_input.click()
-    username_input.send_keys(user)
+    def logout(self):
+        pass
 
-    password_input = driver.find_element(By.XPATH, '//*[@id="current-password"]')
-    password_input.click()
-    password_input.send_keys(passw)
+    def get_url(self):
+        return self.driver.current_url
 
-    login_button = driver.find_element(By.XPATH, '/html/body/div/div/main/div[3]/div/div[2]/div/div/form/button')
-    login_button.click()
+    def get_snapshot(self, url, timeout):
 
+        # Wait for initialize, in seconds
+        wait = WebDriverWait(self.driver, timeout + 10)
 
-def logout():
-    pass
+        self.driver.get(url)
 
+        share_button = wait.until(
+            EC.visibility_of_element_located((By.XPATH, '/html/body/div[1]/div/main/div[3]/header/nav/div[3]/div/button')))
+        share_button.click()
 
-def get_snapshot(url, timeout):
-    driver.get(url)
+        snapshot_tab = self.driver.find_element(By.XPATH, '/html/body/div[3]/div[2]/div[1]/div[1]/ul/li[2]/a')
+        snapshot_tab.click()
 
-    share_button = wait.until(
-        EC.visibility_of_element_located((By.XPATH, '/html/body/div/div/main/div[3]/header/div/div[3]/div/button')))
-    share_button.click()
+        timeout_input = wait.until(EC.visibility_of_element_located((By.XPATH, '//*[@id="timeout-input"]')))
+        timeout_str = str(timeout)
+        timeout_input.send_keys(timeout_str)  # set wait timeout
+        # delete before 4 seconds
+        for i in range(len(timeout_str)):
+            timeout_input.send_keys(Keys.ARROW_LEFT)
+        timeout_input.send_keys(Keys.BACK_SPACE)
 
-    snapshot_tab = driver.find_element(By.XPATH, '/html/body/div[2]/div[2]/div[1]/div[1]/ul/li[2]/a')
-    snapshot_tab.click()
+        expire_selector = wait.until(EC.visibility_of_element_located((By.XPATH, '//*[@id="expire-select-input"]')))
+        expire_selector.click()
+        # set snapshot expire after 24h
+        expire_selector.send_keys(Keys.ARROW_DOWN)
+        expire_selector.send_keys(Keys.ARROW_DOWN)
+        expire_selector.send_keys(Keys.ENTER)
 
-    timeout_input = wait.until(EC.visibility_of_element_located((By.XPATH, '//*[@id="timeout-input"]')))
-    timeout_str = str(timeout)
-    timeout_input.send_keys(timeout_str)  # set wait timeout
-    # delete before 4 seconds
-    for i in range(len(timeout_str)):
-        timeout_input.send_keys(Keys.ARROW_LEFT)
-    timeout_input.send_keys(Keys.BACK_SPACE)
+        snapshot_button = wait.until(
+            EC.visibility_of_element_located((By.XPATH, '/html/body/div[3]/div[2]/div[2]/div/div[5]/div/div[3]/button')))
+        snapshot_button.click()
 
-    expire_selector = wait.until(EC.visibility_of_element_located((By.XPATH, '//*[@id="expire-select-input"]')))
-    expire_selector.click()
-    # set snapshot expire after 24h
-    expire_selector.send_keys(Keys.ARROW_DOWN)
-    expire_selector.send_keys(Keys.ARROW_DOWN)
-    expire_selector.send_keys(Keys.ENTER)
+        snapshot_link = wait.until(
+            EC.visibility_of_element_located((By.XPATH, '/html/body/div[3]/div[2]/div[2]/div/div[1]/div/a')))
 
-    snapshot_button = wait.until(
-        EC.visibility_of_element_located((By.XPATH, '/html/body/div[2]/div[2]/div[2]/div/div[5]/div/div[3]/button')))
-    snapshot_button.click()
-
-    snapshot_link = wait.until(
-        EC.visibility_of_element_located((By.XPATH, '/html/body/div[2]/div[2]/div[2]/div/div[1]/div/a')))
-
-    return snapshot_link.get_attribute('href')
+        return snapshot_link.get_attribute('href')
 
 
-def close_driver():
-    driver.close()
-    driver.quit()
+    def close_driver(self):
+        self.driver.close()
+        self.driver.quit()
 
 
 if __name__ == '__main__':
-    open_url('about:blank')
 
-    login(username, password)
+    if len(sys.argv) < 4:
+        print("Usage: %s <user> <pass> (<dashboard_url>)+ <timeout>?" % sys.argv[0])
+        exit(-1)
+
+    username = sys.argv[1]
+    password = sys.argv[2]
+    urls = sys.argv[3:]
+    if urls[-1].isnumeric():
+        timeout = urls[-1]
+        urls = urls[:-1]
+    else:
+        timeout = 120
+
+    grafana = GrafanaShot()
+
+    grafana.login(username, password)
 
     snapshots = {}
     for url in urls:
         if url not in snapshots:
-            result = get_snapshot(url, timeout)
+            result = grafana.get_snapshot(url, timeout)
             snapshots[url] = result
 
     print(json.dumps(snapshots))
-    close_driver()
+    grafana.close_driver()
