@@ -59,7 +59,7 @@ class GrafanaShot:
             EC.visibility_of_element_located((By.XPATH, '/html/body/div[1]/div/main/div[3]/header/nav/div[3]/div/button')))
         share_button.click()
 
-        snapshot_tab = self.driver.find_element(By.XPATH, '/html/body/div[3]/div[2]/div[1]/div[1]/ul/li[2]/a')
+        snapshot_tab = self.driver.find_element(By.XPATH, '/html/body/div[3]/div[2]/div[1]/div[1]/div/div[2]/a')
         snapshot_tab.click()
 
         timeout_input = wait.until(EC.visibility_of_element_located((By.XPATH, '//*[@id="timeout-input"]')))
