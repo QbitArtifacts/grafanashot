@@ -102,14 +102,14 @@ if __name__ == '__main__':
     password = sys.argv[2]
     urls = sys.argv[3:]
     if urls[-1].isnumeric():
-        timeout = urls[-1]
+        timeout = int(urls[-1])
         urls = urls[:-1]
     else:
         timeout = 120
 
-    grafana = GrafanaShot()
+    grafana = GrafanaShot(headless=False)
 
-    grafana.login(username, password)
+    grafana.login(urls[0], username, password)
 
     snapshots = {}
     for url in urls:
