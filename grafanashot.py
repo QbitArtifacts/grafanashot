@@ -124,6 +124,7 @@ if __name__ == '__main__':
         grafana.close_driver()
         print(json.dumps(snapshots))
     except Exception as e:
+        grafana.close_driver()
         print("<<<<<<< SNAPSHOT FAILED >>>>>>>>")
         logging.error(traceback.format_exc())
         exit(1)
