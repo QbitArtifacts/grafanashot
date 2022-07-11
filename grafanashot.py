@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
 import json
+import logging
 import sys
+import traceback
 
 from selenium import webdriver
 from selenium.webdriver import Keys
@@ -30,7 +32,7 @@ class GrafanaShot:
         self.driver.get(url)
 
         username_input = self.driver.find_element(By.XPATH,
-                                             '/html/body/div/div/main/div[3]/div/div[2]/div/div/form/div[1]/div[2]/div/div/input')
+                                                  '/html/body/div/div/main/div[3]/div/div[2]/div/div/form/div[1]/div[2]/div/div/input')
 
         username_input.click()
         username_input.send_keys(user)
@@ -39,7 +41,8 @@ class GrafanaShot:
         password_input.click()
         password_input.send_keys(passw)
 
-        login_button = self.driver.find_element(By.XPATH, '/html/body/div/div/main/div[3]/div/div[2]/div/div/form/button')
+        login_button = self.driver.find_element(By.XPATH,
+                                                '/html/body/div/div/main/div[3]/div/div[2]/div/div/form/button')
         login_button.click()
 
     def logout(self):
@@ -49,14 +52,14 @@ class GrafanaShot:
         return self.driver.current_url
 
     def get_snapshot(self, url, timeout):
-
         # Wait for initialize, in seconds
         wait = WebDriverWait(self.driver, timeout + 10)
 
         self.driver.get(url)
 
         share_button = wait.until(
-            EC.visibility_of_element_located((By.XPATH, '/html/body/div[1]/div/main/div[3]/header/nav/div[3]/div/button')))
+            EC.visibility_of_element_located(
+                (By.XPATH, '/html/body/div[1]/div/main/div[3]/header/nav/div[3]/div/button')))
         share_button.click()
 
         snapshot_tab = self.driver.find_element(By.XPATH, '/html/body/div[3]/div[2]/div[1]/div[1]/div/div[2]/a')
@@ -78,14 +81,14 @@ class GrafanaShot:
         expire_selector.send_keys(Keys.ENTER)
 
         snapshot_button = wait.until(
-            EC.visibility_of_element_located((By.XPATH, '/html/body/div[3]/div[2]/div[2]/div/div[5]/div/div[3]/button')))
+            EC.visibility_of_element_located(
+                (By.XPATH, '/html/body/div[3]/div[2]/div[2]/div/div[5]/div/div[3]/button')))
         snapshot_button.click()
 
         snapshot_link = wait.until(
             EC.visibility_of_element_located((By.XPATH, '/html/body/div[3]/div[2]/div[2]/div/div[1]/div/a')))
 
         return snapshot_link.get_attribute('href')
-
 
     def close_driver(self):
         self.driver.close()
@@ -107,15 +110,20 @@ if __name__ == '__main__':
     else:
         timeout = 120
 
-    grafana = GrafanaShot()
+    grafana = GrafanaShot(headless=False)
 
-    grafana.login(urls[0], username, password)
+    try:
+        grafana.login(urls[0], username, password)
 
-    snapshots = {}
-    for url in urls:
-        if url not in snapshots:
-            result = grafana.get_snapshot(url, timeout)
-            snapshots[url] = result
+        snapshots = {}
+        for url in urls:
+            if url not in snapshots:
+                result = grafana.get_snapshot(url, timeout)
+                snapshots[url] = result
 
-    print(json.dumps(snapshots))
-    grafana.close_driver()
+        grafana.close_driver()
+        print(json.dumps(snapshots))
+    except Exception as e:
+        print("<<<<<<< SNAPSHOT FAILED >>>>>>>>")
+        logging.error(traceback.format_exc())
+        exit(1)
