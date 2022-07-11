@@ -110,7 +110,7 @@ if __name__ == '__main__':
     else:
         timeout = 120
 
-    grafana = GrafanaShot(headless=False)
+    grafana = GrafanaShot()
 
     try:
         grafana.login(urls[0], username, password)
