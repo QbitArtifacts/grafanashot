@@ -17,9 +17,10 @@ from selenium.webdriver.support import expected_conditions as EC
 class GrafanaShot:
     def __init__(self, headless=True):
         options = Options()
-        options.headless = headless
         options.add_argument('--width=1920')
         options.add_argument('--height=1080')
+        if headless:
+            options.add_argument('--headless')
         service = Service('./bin/geckodriver')
         self.driver = webdriver.Firefox(options=options, service=service)
         self.clear()
