@@ -35,7 +35,8 @@ class GrafanaShot:
         self.driver.get(url)
 
         username_input = self.driver.find_element(By.XPATH,
-                                                  '/html/body/div/div/main/div[3]/div/div[2]/div/div/form/div[1]/div[2]/div/div/input')
+            '/html/body/div/div[1]/div/main/div/div/div[3]/div/div/div[2]/div/div/form/div[1]/div[2]/div/div/div/input'
+        )
 
         username_input.click()
         username_input.send_keys(user)
@@ -45,7 +46,7 @@ class GrafanaShot:
         password_input.send_keys(passw)
 
         login_button = self.driver.find_element(By.XPATH,
-                                                '/html/body/div/div/main/div[3]/div/div[2]/div/div/form/button')
+                                                '/html/body/div/div[1]/div/main/div/div/div[3]/div/div/div[2]/div/div/form/button')
         login_button.click()
 
     def logout(self):
@@ -62,7 +63,7 @@ class GrafanaShot:
 
         share_button = wait.until(
             EC.visibility_of_element_located(
-                (By.XPATH, '/html/body/div[1]/div/main/div[3]/header/nav/div[3]/div/button')))
+                (By.XPATH, '/html/body/div[1]/div[1]/div/div[1]/div[2]/div[2]/div[2]/button')))
         share_button.click()
 
         snapshot_tab = self.driver.find_element(By.XPATH, '/html/body/div[3]/div[2]/div[1]/div[1]/div/div[2]/a')
@@ -89,9 +90,9 @@ class GrafanaShot:
         snapshot_button.click()
 
         snapshot_link = wait.until(
-            EC.visibility_of_element_located((By.XPATH, '/html/body/div[3]/div[2]/div[2]/div/div[1]/div/a')))
+            EC.visibility_of_element_located((By.XPATH, '//*[@id="snapshot-url-input"]')))
 
-        return snapshot_link.get_attribute('href')
+        return snapshot_link.get_attribute('value')
 
     def close_driver(self):
         self.driver.close()
